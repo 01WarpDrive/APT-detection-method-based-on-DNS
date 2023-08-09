@@ -1,0 +1,36 @@
+JSON file path: ./json/dns_flow_1000.json
+total hosts:    189
+total domains:  358
+total features: 189
+C2 log number:     0
+normal log number: 421
+C2 log details: 
+
+JSON file path: ./json/dns_flow_5000.json
+total hosts:    868
+total domains:  1389
+total features: 868
+C2 log number:     1
+normal log number: 2154
+C2 log details: 
+{'host': '10.157.144.149', 'domain': 'dtm-dre.platform.dbankcloud.cn', 'feature': {'M': 3, 'AN': 1.0, 'HC': 1}}
+
+JSON file path: ./json/dns_flow_10000.json
+total hosts:    1693
+total domains:  2562
+total features: 1693
+C2 log number:     2
+normal log number: 4932
+C2 log details: 
+{'host': '10.157.144.149', 'domain': 'dtm-dre.platform.dbankcloud.cn', 'feature': {'M': 3, 'AN': 1.0, 'HC': 1}}
+{'host': '10.157.144.106', 'domain': 'www.qq.com', 'feature': {'M': 3, 'AN': 1.0, 'HC': 1}}
+
+JSON file path: ./json/dns_flow_20000.json
+total hosts:    3025
+total domains:  4649
+total features: 3025
+C2 log number:     1
+normal log number: 11071
+C2 log details: 
+{'host': '10.157.144.149', 'domain': 'www.baidu.com', 'feature': {'M': 3, 'AN': 1.0, 'HC': 1}}
+
