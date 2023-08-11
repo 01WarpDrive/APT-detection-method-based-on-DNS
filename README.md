@@ -68,7 +68,7 @@ C&C通信通常是单独访问目标域，并且目标网页不会有inlined com
 ./json        # 待处理的json数据
 ./pcap        # 可用的网络流量数据
 ./txt         # 输出解析的结果
-dns_parser.py # 将目标pcap文件转化为json文件，读取处理DNS记录
+dns_parser.py # 将目标pcap文件转化为json文件，读取处理DNS记录，应用了python库flowcontainer
 detect.py     # 提取特征向量并进行分类
 ```
 
@@ -80,8 +80,19 @@ read.py       # zeek数据集转换为json工具
 
 ### 数据集
 
-1. 初步采用aptminer提供的一个流量数据集，尝试进行解析，处理得到合适的DNS信息。数据集格式为pcap[网络流量领域公开数据集及工具库_网络流量数据集_Icoding_F2014的博客-CSDN博客](https://blog.csdn.net/jmh1996/article/details/90666499)使用工具[jmhIcoding/flowcontainer: 从pcap获取流的基本信息工具 (github.com)](https://github.com/jmhIcoding/flowcontainer)进行解析。
-2. 尝试了zeek的DNS数据集，由于目前的程序无法快速处理极大的数据量，仅测试不高于20000条的dns记录。
+1. [网络流量领域公开数据集及工具库_网络流量数据集_Icoding_F2014的博客-CSDN博客](https://blog.csdn.net/jmh1996/article/details/90666499)
+
+   初步采用aptminer提供的一个流量数据集，尝试进行解析，处理得到合适的DNS信息。数据集格式为pcap使用工具[jmhIcoding/flowcontainer: 从pcap获取流的基本信息工具 (github.com)](https://github.com/jmhIcoding/flowcontainer)进行解析。该数据集较小，无法测试仿真的正确性。
+
+2. [dns.log — Book of Zeek (git/master)](https://docs.zeek.org/en/master/logs/dns.html)
+
+   尝试了zeek的DNS数据集，由于目前的程序无法快速处理极大的数据量，仅测试不高于20000条的dns记录。该数据集较大，能够很好地体现数据的周期性，测试效果优良。由于没有标注，无法定量的计算正确率。
+
+3. [Botnet 2014 | Datasets | Research | Canadian Institute for Cybersecurity | UNB](https://www.unb.ca/cic/datasets/botnet.html)
+
+   一个僵尸网络数据集，标注好了恶意ip。使用其中一个数据集，25883个dns记录。
+
+   
 
 ### 分类算法
 
@@ -97,6 +108,10 @@ read.py       # zeek数据集转换为json工具
    >
    > 如果将同一个DNS记录中多个目标域拆分成多个DNS记录，将会污染上述数据，因此先只提取第一个A类型对应的域名。
 
+2. 检测效果与数据规模的影响
+
+   > 在测试中，曾经用同一批的数据由小批量到大批量测试。发现一些在小批量检测出来的疑似C2域名，在大批量检测中被归类为普通。就原理来看，应该是随着数据规模增大，同一个域名的访问量增加，置信度将趋于准确。因此理论上代码对超大规模的DNS数据可能表现出优良的性能，很遗憾暂时无法提升代码性能，测试$10^5$以上规模的数据。
+
 ### 仿真结果和评估
 
 ![image-20230808235212483](./assets/image-20230808235212483.png)
@@ -109,8 +124,9 @@ read.py       # zeek数据集转换为json工具
 
 当然，本次仿真相比论文作者做的工作，略显简陋。例如特征参数的阈值，作者是通过对标注好的dns数据集进行训练，得到的参数。  显然，面对不同风格的apt攻击，固定的参数不能发挥算法最好的效果。
 
-### 评估和思考
+### 总结思考
 
 1. 整个方法基于DNS记录，如果恶意软件直接通过IP地址访问，将无法检测。
-2. 论文中没有考虑主机对DNS缓存，导致同一网站第二次访问没有DNS记录。是否有影响呢？
-3. 存在一些特殊情况，如云盘服务，会产生一些规律性DNS记录，并且所指向的网页不是面向访客的网页，因此CODD会很小。因此，需要维护一个合适的白名单。
+2. 论文中没有考虑主机对DNS缓存，导致同一网站第二次访问没有DNS记录。可能存在影响。
+3. 存在一些特殊情况，如云盘服务，会产生一些规律性DNS记录，并且所指向的网页不是面向访客的网页，因此CODD会很小。因此，需要维护一个合适的白名单。、
+4. 笔者复现的代码效率较低。初步来看，应当改进目前的数据结构。需要优化时间相关的特征提取，实现多线程处理。
